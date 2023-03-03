@@ -1,6 +1,6 @@
 const PersonForm = ({
   hasName,
-  alertExisted,
+  updatePerson,
   addPesrson,
   newName,
   newNumber,
@@ -8,7 +8,7 @@ const PersonForm = ({
   handleNumberChange,
 }) => {
   return (
-    <form onSubmit={hasName ? alertExisted : addPesrson}>
+    <form onSubmit={hasName ? updatePerson : addPesrson}>
       <div>
         name: <input value={newName} onChange={handleNameChange} />
       </div>
