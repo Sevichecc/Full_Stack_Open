@@ -4,12 +4,17 @@ import personService from './services/persons';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import Notification from './components/Notification';
+
+import './index.css';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [errMessage, setErrorMessage] = useState('');
+  const [okMessage, setOkMessage] = useState('');
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => setPersons(initialPersons));
@@ -30,6 +35,27 @@ const App = () => {
     setFilter(event.target.value);
   };
 
+  const addPesrson = (event) => {
+    event.preventDefault();
+
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
+    personService
+      .create(personObject)
+      .then((returnedPersons) => {
+        setPersons(persons.concat(returnedPersons));
+        setNewName('');
+        setNewNumber('');
+        setOkMessage(`Added ${newName}`);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const updatePerson = (event) => {
     event.preventDefault();
     if (
@@ -47,30 +73,11 @@ const App = () => {
           setPersons(persons.map((p) => (p.id !== id ? p : returnedPersons)));
           setNewName('');
           setNewNumber('');
+          setOkMessage(`Changed ${newName}'s Number`);
         })
         .catch((err) => console.log(err));
     }
     return;
-  };
-
-  const addPesrson = (event) => {
-    event.preventDefault();
-
-    const personObject = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
-    };
-    personService
-      .create(personObject)
-      .then((returnedPersons) => {
-        setPersons(persons.concat(returnedPersons));
-        setNewName('');
-        setNewNumber('');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
   const removePerson = (id) => {
@@ -84,6 +91,11 @@ const App = () => {
           setPersons(persons.filter((person) => person.id !== id));
         })
         .catch((err) => {
+          if (err.response.status === 404) {
+            setErrorMessage(
+              `Information of ${deletePerson} has already been removed from server`
+            );
+          }
           console.log(err);
         });
     } else {
@@ -98,6 +110,10 @@ const App = () => {
   return (
     <div>
       <h2>Numberbook</h2>
+      <Notification
+        message={errMessage ? errMessage : okMessage}
+        className={errMessage ? 'error' : 'success'}
+      />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>Add a Note</h2>
       <PersonForm
