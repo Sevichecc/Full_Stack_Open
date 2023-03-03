@@ -6,15 +6,12 @@ import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 import Notification from './components/Notification';
 
-import './index.css';
-
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
-  const [errMessage, setErrorMessage] = useState('');
-  const [okMessage, setOkMessage] = useState('');
+  const [info, setInfo] = useState({ message: null });
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => setPersons(initialPersons));
@@ -49,7 +46,7 @@ const App = () => {
         setPersons(persons.concat(returnedPersons));
         setNewName('');
         setNewNumber('');
-        setOkMessage(`Added ${newName}`);
+        notifyWith(`Added ${newName}`);
       })
       .catch((err) => {
         console.log(err);
@@ -64,7 +61,7 @@ const App = () => {
       )
     ) {
       const person = persons.find((person) => person.name === newName);
-      const { id } = person;
+      const { id, name } = person;
       const changePerson = { ...person, number: newNumber };
 
       personService
@@ -73,9 +70,11 @@ const App = () => {
           setPersons(persons.map((p) => (p.id !== id ? p : returnedPersons)));
           setNewName('');
           setNewNumber('');
-          setOkMessage(`Changed ${newName}'s Number`);
+          notifyWith(`phone number of ${name} updated!`);
         })
-        .catch((err) => console.log(err));
+        .catch((err) =>
+          notifyWith(`${name} has already been removed`, 'error')
+        );
     }
     return;
   };
@@ -89,12 +88,11 @@ const App = () => {
         .remove(id)
         .then(() => {
           setPersons(persons.filter((person) => person.id !== id));
+          notifyWith(`number of ${deletePerson} deleted!`);
         })
         .catch((err) => {
           if (err.response.status === 404) {
-            setErrorMessage(
-              `Information of ${deletePerson} has already been removed from server`
-            );
+            notifyWith(`${deletePerson} has already been removed`, 'error');
           }
           console.log(err);
         });
@@ -107,13 +105,20 @@ const App = () => {
     ? persons.filter((person) => person.name.match(new RegExp(filter, 'gi')))
     : persons;
 
+  const notifyWith = (message, type = 'info') => {
+    setInfo({
+      message,
+      type,
+    });
+
+    setTimeout(() => {
+      setInfo({ message: null });
+    }, 3000);
+  };
   return (
     <div>
       <h2>Numberbook</h2>
-      <Notification
-        message={errMessage ? errMessage : okMessage}
-        className={errMessage ? 'error' : 'success'}
-      />
+      <Notification info={info} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>Add a Note</h2>
       <PersonForm
