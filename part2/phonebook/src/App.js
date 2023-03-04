@@ -106,7 +106,7 @@ const App = () => {
     : persons
 
   return (
-    <div>
+   <div>
       <h2>Numberbook</h2>
       <Notification info={info} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />

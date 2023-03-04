@@ -24,7 +24,6 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.36.0",
     "eslint": "^8.35.0",
     "json-server": "^0.17.2"
   },
