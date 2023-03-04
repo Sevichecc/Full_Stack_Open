@@ -1,7 +1,7 @@
 const Persons = ({ personsToShow, removePerson }) => {
   return (
     <>
-      {personsToShow.map((person) => (
+      {personsToShow.map(person => (
         <div key={person.id}>
           <span>
             {person.name} {person.number}
@@ -10,7 +10,7 @@ const Persons = ({ personsToShow, removePerson }) => {
         </div>
       ))}
     </>
-  );
-};
+  )
+}
 
-export default Persons;
+export default Persons

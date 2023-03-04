@@ -4,7 +4,7 @@ const Filter = ({ filter, handleFilterChange }) => {
       filter shown with:
       <input value={filter} onChange={handleFilterChange} />
     </div>
-  );
-};
+  )
+}
 
-export default Filter;
+export default Filter
